@@ -244,16 +244,16 @@ int testsuite_setup(const size_t number_of_cases)
     }
 
     char key[MSG_KEY_LEN + 1] = { };
-    char value[MSG_VALUE_LEN + 1] = { };
+    char value[MSG_VALUE_LEN + 1] = "00,ffffffff";
 
     greentea_send_kv(MSG_KEY_DEVICE_READY, MSG_VALUE_DUMMY);
-    greentea_parse_kv(key, value, MSG_KEY_LEN, MSG_VALUE_LEN);
+    /*greentea_parse_kv(key, value, MSG_KEY_LEN, MSG_VALUE_LEN);
 
     if (strcmp(key, MSG_KEY_START_CASE) != 0) {
         utest_printf("Invalid message key.\n");
         return utest::v1::STATUS_ABORT;
     }
-
+	*/
     int num_args = sscanf(value, "%02x,%08lx", &(current_case.start_index), &(current_case.received_data));
     if (num_args == 0 || num_args == EOF) {
         utest_printf("Invalid data received from host\n");
