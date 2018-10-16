@@ -27,7 +27,7 @@
         },
         "debug-enabled": {
             "help": "Enable debug trace support",
-            "value": false
+            "value": true
         },
         "ppp-enabled": {
             "help": "Enable support for PPP interfaces",
@@ -157,6 +157,12 @@
             "tcp-wnd": "(TCP_MSS * 8)",
             "pbuf-pool-size": 16,
             "mem-size": 51200
+        },
+        "FVP_MPS2_M3": {
+            "tcpip-thread-stacksize": 2400,
+            "default-thread-stacksize": 1024,
+            "ppp-thread-stacksize": 1024,
+            "mem-size": 36496
         }
     }
 }
