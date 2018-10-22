@@ -30,6 +30,14 @@
 
 #include "platform/inc/platform_mbed.h"
 
+
+//#define MBEDTLS_TEST_NULL_ENTROPY
+//#define MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
+//#define MBEDTLS_ENTROPY_C
+//#define MBEDTLS_NO_PLATFORM_ENTROPY
+//#undef MBEDTLS_ENTROPY_HARDWARE_ALT
+
+
 /*
  * Only use features that do not require an entropy source when
  * DEVICE_ENTROPY_SOURCE is not defined in mbed OS.

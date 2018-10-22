@@ -31,6 +31,7 @@
 #endif
 
 #include <string.h>
+#include <stdlib.h>
 
 #if defined(MBEDTLS_ENTROPY_C)
 
@@ -204,13 +205,13 @@ int mbedtls_null_entropy_poll( void *data,
 {
     ((void) data);
     ((void) output);
-    *olen = 0;
+    *olen = sizeof(unsigned int);
+    int a  = rand();
+    //if( len < sizeof(unsigned char) )
+        //return( 0 );
 
-    if( len < sizeof(unsigned char) )
-        return( 0 );
-
-    *olen = sizeof(unsigned char);
-
+    //*olen = sizeof(unsigned char);
+    memcpy( output, &a, *olen );
     return( 0 );
 }
 #endif

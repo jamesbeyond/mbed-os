@@ -78,6 +78,11 @@ struct flash_s {
     uint8_t not_used;
 };
 
+/* This TRNG structure is not used by the HAL implementation. */
+struct trng_s {
+    uint8_t not_used;
+};
+
 #include "gpio_object.h"
 
 #ifdef __cplusplus

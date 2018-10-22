@@ -22,7 +22,7 @@
  * The implementation emulates flash over SRAM.
  */
 
-#define FLASH_PAGE_SIZE   256
+#define FLASH_PAGE_SIZE   8
 #define FLASH_OFS_START   ZBT_SRAM1_START
 #define FLASH_SECTOR_SIZE 0x1000
 #define FLASH_OFS_END     (ZBT_SRAM1_START + ZBT_SRAM1_SIZE)

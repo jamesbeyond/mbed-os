@@ -4383,7 +4383,7 @@
         "public": false,
         "supported_toolchains": ["GCC_ARM", "ARM", "IAR"],
         "OUTPUT_EXT": "elf",
-        "device_has": ["AACI", "ANALOGIN", "CLCD", "FLASH", "I2C", "INTERRUPTIN", "PORTIN", "PORTINOUT", "PORTOUT", "SERIAL", "SERIAL_FC", "SPI", "SPISLAVE", "TSC", "USTICKER", "EMAC"],
+        "device_has": ["AACI", "ANALOGIN", "CLCD", "FLASH", "I2C", "INTERRUPTIN", "PORTIN", "PORTINOUT", "PORTOUT", "SERIAL", "SERIAL_FC", "SPI", "SPISLAVE", "TSC", "USTICKER", "EMAC", "TRNG" ],
         "release_versions": ["5"],
         "extra_labels": ["ARM_FM_EMAC"],
         "overrides": {
