@@ -1,25 +1,45 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2006-2018 ARM Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef __LAN91C111_H
 #define __LAN91C111_H
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include "PeripheralNames.h"
 
-#define FVP_ETH_MAX_FLEN         (1522) // recommended size for a VLAN frame
-#define FVP_HWADDR_SIZE           (6)
+/* LAN91C111 base address used IO mode. */
+#define ADROFS     0x40200000   
 
-#define FVP_ETH_MTU_SIZE          1500
-#define FVP_ETH_IF_NAME           "fm"
+/* LAN91C111 Ethernet buffer alignment. */
+#define LAN91_BUFF_ALIGNMENT 16U
 
-#define LAN91_BUFF_ALIGNMENT 16U   /*!< Ethernet buffer alignment. */
-
-/*--------------------------- End of function ---------------------------------*/
-
-
-#define ADROFS     0x40200000   /* LAN91C111 base address used IO mode      */
+#define LAN91_ETH_MTU_SIZE          1500
 
 /* Absolute access to LAN91C111 registers macro */
 #define LREG(object, reg)   (*((object volatile *) (ADROFS+reg)))
+
+/*******************************************************************************
+ * Register Definations
+ ******************************************************************************/
 
 /* Bank Select defines */
 #define BSR        0x0E         /* Bank Select register common to all banks  */
@@ -230,21 +250,9 @@
 #endif
 
 
-
-/*----------------------------------------------------------------------------*/
-/* Stractures */
-
-/*! @brief Defines the status return codes for transaction. */
-enum _lan91_status
-{
-    LAN91_Success,
-    LAN91_RxFrameError, /*!< A frame received but data error happen. */
-    LAN91_RxFrameFail,  /*!< Failed to receive a frame. */
-    LAN91_RxFrameEmpty, /*!< No frame arrive. */
-    LAN91_TxFrameBusy,                       /*!< Transmit buffer descriptors are under process. */
-    LAN91_TxFrameFail /*!< Transmit frame fail. */
-};
-
+/*******************************************************************************
+ * Data Stractures
+ ******************************************************************************/
 
 /*! @brief List of interrupts supported by the peripheral. This
  * enumeration uses one-bot encoding to allow a logical OR of multiple
@@ -253,9 +261,9 @@ enum _lan91_status
  */
 typedef enum _lan91_phy_status
 {
-    STATE_UNKNOWN    = (-1),    /* PHY MI Register 18 change status interrupt*/
-    STATE_LINK_DOWN  = (0),    /* EPH Type interrupt                        */
-    STATE_LINK_UP  = (1)    /* Receive Overrun interrupt                 */
+    STATE_UNKNOWN    = (-1),  /* PHY MI Register 18 change status interrupt*/
+    STATE_LINK_DOWN  = (0),   /* EPH Type interrupt                        */
+    STATE_LINK_UP    = (1)    /* Receive Overrun interrupt                 */
 } lan91_phy_status_t;
 
 /*! @brief Defines the common interrupt event for callback use. */
@@ -263,7 +271,7 @@ typedef enum _lan91_event
 {
     LAN91_RxEvent,     /*!< Receive event. */
     LAN91_TxEvent,     /*!< Transmit event. */
-    LAN91_ErrEvent    /*!< Error event: BABR/BABT/EBERR/LC/RL/UN/PLR . */
+    LAN91_ErrEvent     /*!< Error event: BABR/BABT/EBERR/LC/RL/UN/PLR . */
 } lan91_event_t;
 
 
@@ -284,145 +292,122 @@ struct _lan91_handle
 };
 
 
-/*--------------------------- APIs ----------------------------------*/
-#if defined(__cplusplus)
-extern "C" {
-#endif
+/*******************************************************************************
+ * functions
+ ******************************************************************************/
 
-
-/* ------------------- Function Prototypes ------------------------------*/
+/** @brief Initialize the Lan91C111 ethernet controller. */
 void LAN91_init (void);
 
-bool LAN91_send_frame (uint32_t *buff, uint32_t *size );
-bool LAN91_receive_frame (uint32_t *buff, uint32_t *size );
+/** @brief Read MAC address stored to external EEPROM. */
+void read_MACaddr(uint8_t *addr);
 
-void ETHERNET_Handler(void);
-
-static void delay_1ms (uint32_t time);
-static void output_MDO (int bit_value);
-static void output_MDO (int bit_value);
-static int  input_MDI (void);
-static void write_PHY (uint32_t PhyReg, int Value);
-static uint16_t  read_PHY (uint32_t PhyReg);
-
-
-
-/*!
- * @name Transactional operation
- * @{
- */
-
-/*!
+/**
  * @brief Sets the callback function.
- * This API is provided for the application callback required case when ENET
- * interrupt is enabled. This API should be called after calling ENET_Init.
- *
- * @param handle ENET handler pointer. Should be provided by application.
- * @param callback The ENET callback function.
+ * @param callback The callback function.
  * @param userData The callback function parameter.
  */
 void LAN91_SetCallback(lan91_callback_t callback, void *userData);
 
+/** @brief Send frame from given data buffer to Lan91C111 ethernet controller. */
+bool LAN91_send_frame (uint32_t *buff, uint32_t *size );
+
+/** @brief Receive frame from Lan91C111 ethernet controller to a given data buffer. */
+bool LAN91_receive_frame (uint32_t *buff, uint32_t *size );
+
+/** @brief Ethernet interrupt handler. */
+void ETHERNET_Handler(void);
+
+/** @brief Check Ethernet controller link status. */
+lan91_phy_status_t LAN91_GetLinkStatus(void);
+
+/** @brief Output a bit value to the MII PHY management interface. */
+static void output_MDO (int bit_value);
+
+/** @brief Input a bit value from the MII PHY management interface. */
+static int  input_MDI (void);
+
+/** @brief Write a data value to PHY register. */
+static void write_PHY (uint32_t PhyReg, int Value);
+
+/** @brief Read a PHY register. */
+static uint16_t read_PHY (uint32_t PhyReg);
 
 
-/*--------------------------- inline functions ---------------------------------*/
+/*******************************************************************************
+ * inline functions
+ ******************************************************************************/
 
-/*!
- * @brief Resets the ENET module.
- *
- * This function restores the ENET module to the reset state.
- * Note that this function sets all registers to the
- * reset state. As a result, the ENET module can't work after calling this function.
- *
- * @param base  ENET peripheral base address.
- */
+/** @brief Select Bank Register of LAN91C111 controller. */
+static inline void LAN91_SelectBank(uint8_t bank)
+{
+    uint16_t current_bank = ( LREG (uint16_t, BSR) & BSR_MASK );
+    if ( (bank & BSR_MASK) != current_bank )
+    {
+        LREG (uint16_t, BSR)    = (bank & BSR_MASK);
+    }
+    
+}
+
+/** @brief Resets the LAN91C111 controller. */
 static inline void LAN91_Reset(void)
 {
-
-
-    /* Output reset to LAN controller */
-    LREG (uint16_t, BSR)    = 0;
+    LAN91_SelectBank(0);
     LREG (uint16_t, B0_RCR) = RCR_SOFT_RST;
 }
 
-
-/*!
- * @name Other basic operations
- * @{
- */
-
-/*!
- * @brief Activates ENET read or receive.
- *
- * @param base  ENET peripheral base address.
- *
- * @note This must be called after the MAC configuration and
- * state are ready. It must be called after the ENET_Init() and
- * ENET_Ptp1588Configure(). This should be called when the ENET receive required.
- */
-static inline void LAN91_ActiveRead()
-{
-    // add code
-}
-
-/*!
- * @brief Gets the ENET interrupt status flag.
- *
- * @param base  ENET peripheral base address.
- * @return The event status of the interrupt source. This is the logical OR of members
- *         of the enumeration :: enet_interrupt_enable_t.
- */
+/** @brief Gets the LAN91C111 interrupt status flag. */
 static inline uint8_t LAN91_GetInterruptStatus(void)
 {
-    /* Select BANK 2 */
-    LREG (uint16_t, BSR) = 2;
+    LAN91_SelectBank(2);
     return LREG (uint8_t, B2_IST);
 }
 
-static inline bool LAN91_GetFIFOStatus(void)
+/** @brief Get FIFO status if RxFIFO is empty. 
+ *  @return ture for RxFIFO is empty, false for RxFIFO it not empty. */
+static inline bool LAN91_RxFIFOEmpty(void)
 {
-    /* Select BANK 2 */
-    LREG (uint16_t, BSR) = 2;
-    return (( LREG (uint16_t, B2_FIFO) & FIFO_REMPTY ) == 0);
+    LAN91_SelectBank(2);
+    return (( LREG(uint8_t, B2_IST) & IST_RCV ) == 0);
+    //return (( LREG (uint16_t, B2_FIFO) & FIFO_REMPTY ) == 1);
 }
 
-/*!
- * @brief Clears the ENET interrupt events status flag.
- *
- * This function clears enabled ENET interrupts according to the provided mask. The mask
- * is a logical OR of enumeration members. See the @ref enet_interrupt_enable_t.
- * For example, to clear the TX frame interrupt and RX frame interrupt, do the following.
- * @code
- *     ENET_ClearInterruptStatus(ENET, kENET_TxFrameInterrupt | kENET_RxFrameInterrupt);
- * @endcode
- *
- * @param base  ENET peripheral base address.
- * @param mask  ENET interrupt source to be cleared.
- * This is the logical OR of members of the enumeration :: enet_interrupt_enable_t.
- */
-static inline void LAN91_ClearInterruptStatus(void)
+/** @brief Get FIFO status if TxFIFO is empty. 
+ *  @return ture for TxFIFO is empty, false for TxFIFO it not empty. */
+static inline bool LAN91_TxFIFOEmpty(void)
+{
+    LAN91_SelectBank(2);
+    return (( LREG(uint8_t, B2_IST) & IST_TX_INT ) == 0);
+}
+
+/** @brief Clears the Ethernet interrupt status flag. */
+static inline void LAN91_ClearInterruptMasks(void)
 {
     /* Mask off all interrupts */
-    LREG (uint16_t, BSR)    = 2;
+    LAN91_SelectBank(2);
     LREG (uint8_t,  B2_MSK) = 0;
 }
 
+static inline void LAN91_SetInterruptMasks(const uint8_t mask)
+{
+    /* Mask off all interrupts */
+    LAN91_SelectBank(2);
+    LREG (uint8_t,  B2_MSK) = mask;
+}
 
+static inline uint8_t LAN91_GetInterruptMasks(void)
+{
+    /* Mask off all interrupts */
+    LAN91_SelectBank(2);
+    return (LREG (uint8_t,  B2_MSK));
+}
+
+/** @brief Enable Ethernet interrupt handler. */
 static inline void LAN91_SetHandler(void)
 {
     NVIC_EnableIRQ(ETHERNET_IRQn);
 }
 
-
-/*--------------------------- End of inline functions ---------------------------------*/
-
-
-
 #if defined(__cplusplus)
 }
 #endif
-
-/*----------------------------------------------------------------------------
- * end of file
- *---------------------------------------------------------------------------*/
-
