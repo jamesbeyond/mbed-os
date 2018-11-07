@@ -27,7 +27,7 @@
         },
         "debug-enabled": {
             "help": "Enable debug trace support",
-            "value": true
+            "value": false
         },
         "ppp-enabled": {
             "help": "Enable support for PPP interfaces",
