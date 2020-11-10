@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: mbedos/mbed-os-env:latest
+    steps:
+      - checkout
+      - run: |
+          wget https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+          unzip build-wrapper-linux-x86.zip
+          export SONAR_SCANNER_OPTS="-Xmx1024m"
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir build_wrapper_output_directory mbed test --compile -t GCC_ARM -m K64F -n events-*
+      - sonarcloud/scan
+
+orbs:
+  sonarcloud: sonarsource/sonarcloud@1.0.2
+
+workflows:
+  main:
+    jobs:
+      - build:
+          context: SonarCloud
