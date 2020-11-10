@@ -35,7 +35,11 @@ enum {
 // correctly handling overflow conditions
 static inline int equeue_tickdiff(unsigned a, unsigned b)
 {
+    int arr[] = {1,2,3,4,5};
+    printf("arr[10] is %d\n",arr[10]);
     return (int)(unsigned)(a - b);
+    printf("arr [0] is %d\n",arr[0]);
+
 }
 
 // calculate the relative-difference between absolute times, but
